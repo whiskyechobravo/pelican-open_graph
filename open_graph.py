@@ -51,7 +51,7 @@ def tag_article(instance):
 
     ogtags.append(('article:published_time', strftime(instance.date, "%Y-%m-%d")))
     if instance.metadata.get('modified'):
-        ogtags.append(('article:modified_time', strftime(instance.metadata.get('modified'), "%Y-%m-%d")))
+        ogtags.append(('article:modified_time', strftime(instance.modified, "%Y-%m-%d")))
 
     author_fb_profiles = instance.settings.get('AUTHOR_FB_ID', {})
     if len(author_fb_profiles) > 0:
