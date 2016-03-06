@@ -38,7 +38,7 @@ def tag_article(instance):
 
     ogtags.append(('og:description', instance.metadata.get('og_description',
                                                            instance.metadata.get('summary',
-                                                                                 ''))))
+                                                                                 instance.summary))))
 
     default_locale = instance.settings.get('LOCALE', [])
     if default_locale:
