@@ -64,7 +64,7 @@ def tag_article(instance):
         for tag in instance.tags:
             ogtags.append(('article:tag', tag.name))
     except AttributeError:
-            ogtags.append(('article:tag', 'untagged'))
+            pass
 
     instance.ogtags = ogtags
 
