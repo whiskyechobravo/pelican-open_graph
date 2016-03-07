@@ -60,8 +60,11 @@ def tag_article(instance):
 
     ogtags.append(('article:section', instance.category.name))
 
-    for tag in instance.tags:
-        ogtags.append(('article:tag', tag.name))
+    try:
+        for tag in instance.tags:
+            ogtags.append(('article:tag', tag.name))
+    except AttributeError:
+            pass
 
     instance.ogtags = ogtags
 
