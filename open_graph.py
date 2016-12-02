@@ -49,6 +49,10 @@ def tag_article(instance):
 
     ogtags.append(('og:site_name', instance.settings.get('SITENAME', '')))
 
+    if hasattr(instance, 'related_posts'):
+        for related_post in instance.related_posts:
+            ogtags.append(('og:see_also', related_post.url))
+    
     ogtags.append(('article:published_time', strftime(instance.date, "%Y-%m-%d")))
     
     if hasattr(instance, 'modified'):
@@ -67,10 +71,15 @@ def tag_article(instance):
             ogtags.append(('article:tag', tag.name))
     except AttributeError:
             pass
-
+        
     instance.ogtags = ogtags
 
 
+def tag_articles(generator):
+    for article in chain(generator.articles, generator.drafts):
+        tag_article(article)
+
+
 def register():
-    signals.content_object_init.connect(tag_article)
+    signals.article_generator_finalized.connect(tag_articles)
 
