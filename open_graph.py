@@ -52,7 +52,8 @@ def tag_article(instance):
 
     if hasattr(instance, 'related_posts'):
         for related_post in instance.related_posts:
-            ogtags.append(('og:see_also', related_post.url))
+            url = os.path.join(instance.settings.get('SITEURL', ''), related_post.url)
+            ogtags.append(('og:see_also', url))
     
     ogtags.append(('article:published_time', strftime(instance.date, "%Y-%m-%d")))
     

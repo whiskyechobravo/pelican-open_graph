@@ -25,7 +25,7 @@ article category and from these standard metadata tags:
 - ``modified``
 - ``tags``
 
-Additionally, the plugin also read these metadata tags:
+Additionally, the plugin also reads these metadata tags:
 
 - ``og_image``, an URL to an image that will represent your article;
 - ``og_description``, a short description of your article. If not
