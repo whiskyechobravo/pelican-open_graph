@@ -5,72 +5,97 @@ Open Graph
 
 This plugin adds Open Graph Protocol tags to articles.
 
-Use like this in your template:
+Use like this in your base.html template:
 
 .. code-block:: jinja2
 
-    {% for tag in article.ogtags %}
-        <meta property="{{tag[0]}}" content="{{tag[1]|striptags|e}}" />
-    {% endfor %}
+  {% if article %}
+  {% for tag in article.ogtags %}
+  <meta property="{{tag[0]}}" content="{{tag[1]|striptags|e}}" />
+  {% endfor %}
+  {% endif %}
+
+  {% if page  %}
+  {% for tag in page.ogtags %}
+  <meta property="{{tag[0]}}" content="{{tag[1]|striptags|e}}" />
+  {% endfor %}
+  {% endif %}
 
 """
 from __future__ import unicode_literals
 
 import os.path
 
-from pelican import contents
-from pelican import signals
-from pelican.utils import strftime, path_to_url
+from pelican import generators, signals
+from pelican.utils import strftime
 
-def tag_article(instance):
-    if not isinstance(instance, contents.Article):
-        return
 
-    ogtags = [('og:title', instance.title),
+def open_graph_tag_articles(content_generators):
+
+    for generator in content_generators:
+        if isinstance(generator, generators.ArticlesGenerator):
+            for article in (
+                    generator.articles +
+                    generator.translations +
+                    generator.drafts):
+                open_graph_tag(article)
+        elif isinstance(generator, generators.PagesGenerator):
+            for page in generator.pages:
+                open_graph_tag(page)
+
+    return True
+
+
+def open_graph_tag(item):
+
+    ogtags = [('og:title', item.title),
               ('og:type', 'article')]
 
-    image = instance.metadata.get('og_image', '')
+    image = item.metadata.get('og_image', '')
     if image:
         ogtags.append(('og:image', image))
 
-    url = os.path.join(instance.settings.get('SITEURL', ''), instance.url)
+    url = os.path.join(item.settings.get('SITEURL', ''), item.url)
     ogtags.append(('og:url', url))
 
-    ogtags.append(('og:description', instance.metadata.get('og_description',
-                                                           instance.metadata.get('summary',
-                                                                                 instance.summary))))
+    default_summary = item.summary
+    description = item.metadata.get('og_description', default_summary)
+    ogtags.append(('og:description', description))
 
-    default_locale = instance.settings.get('LOCALE', [])
+    default_locale = item.settings.get('LOCALE', [])
     if default_locale:
         default_locale = default_locale[0]
     else:
         default_locale = ''
-    ogtags.append(('og:locale', instance.metadata.get('og_locale', default_locale)))
+    ogtags.append(
+        ('og:locale', item.metadata.get('og_locale', default_locale)))
 
-    ogtags.append(('og:site_name', instance.settings.get('SITENAME', '')))
+    ogtags.append(('og:site_name', item.settings.get('SITENAME', '')))
 
-    ogtags.append(('article:published_time', strftime(instance.date, "%Y-%m-%d")))
-    
-    if hasattr(instance, 'modified'):
-        ogtags.append(('article:modified_time', strftime(instance.modified, "%Y-%m-%d")))
+    ogtags.append(('article:published_time',
+                   strftime(item.date, "%Y-%m-%d")))
 
-    author_fb_profiles = instance.settings.get('AUTHOR_FB_ID', {})
+    if hasattr(item, 'modified'):
+        ogtags.append(('article:modified_time', strftime(
+            item.modified, "%Y-%m-%d")))
+
+    author_fb_profiles = item.settings.get('AUTHOR_FB_ID', {})
     if len(author_fb_profiles) > 0:
-        for author in instance.authors:
+        for author in item.authors:
             if author.name in author_fb_profiles:
-                ogtags.append(('article:author', author_fb_profiles[author.name]))
+                ogtags.append(
+                    ('article:author', author_fb_profiles[author.name]))
 
-    ogtags.append(('article:section', instance.category.name))
+    ogtags.append(('article:section', item.category.name))
 
     try:
-        for tag in instance.tags:
+        for tag in item.tags:
             ogtags.append(('article:tag', tag.name))
     except AttributeError:
-            pass
+        pass
 
-    instance.ogtags = ogtags
+    item.ogtags = ogtags
 
 
 def register():
-    signals.content_object_init.connect(tag_article)
-
+    signals.all_generators_finalized.connect(open_graph_tag_articles)
