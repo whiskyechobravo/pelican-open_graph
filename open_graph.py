@@ -89,6 +89,11 @@ def open_graph_tag(item):
         ogtags.append(('article:modified_time', strftime(
             item.modified, "%Y-%m-%d")))
 
+    if hasattr(item, 'related_posts'):
+        for related_post in item.related_posts:
+            url = os.path.join(item.settings.get('SITEURL', ''), related_post.url)
+            ogtags.append(('og:see_also', url))
+
     author_fb_profiles = item.settings.get('AUTHOR_FB_ID', {})
     if len(author_fb_profiles) > 0:
         for author in item.authors:
