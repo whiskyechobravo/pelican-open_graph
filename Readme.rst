@@ -34,7 +34,7 @@ article category and from these standard metadata tags:
 - ``modified``
 - ``tags``
 
-Additionaly, the plugin also read these metadata tags:
+Additionally, the plugin also reads these metadata tags:
 
 - ``og_image``, an URL to an image that will represent your article;
 - ``og_description``, a short description of your article. If not
@@ -42,3 +42,5 @@ Additionaly, the plugin also read these metadata tags:
   too long;
 - ``og_locale``, the locale of your article (e.g. 'fr_CA'). If not provided,
   the locale will be set to your Pelican settings ``LOCALE``.
+
+Additionally, the plugin reads article.related_posts to set ``og:see_also``.
