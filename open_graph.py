@@ -82,7 +82,7 @@ def open_graph_tag(item):
 
     ogtags.append(('og:site_name', item.settings.get('SITENAME', '')))
 
-    if hasattr(item, date):
+    if hasattr(item, 'date'):
         ogtags.append(('article:published_time',
             strftime(item.date, "%Y-%m-%d")))
 
