@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*- #
-"""
-Open Graph
-==========
+"""Open Graph.
 
 This plugin adds Open Graph Protocol tags to articles.
 
@@ -26,13 +24,14 @@ from __future__ import unicode_literals
 
 import os.path
 
-from pelican import generators, signals
-from pelican.utils import strftime
 from bs4 import BeautifulSoup
+from pelican import generators
+from pelican import signals
+from pelican.utils import strftime
 
 
 def open_graph_tag_articles(content_generators):
-
+    """Get different Pelican objects."""
     for generator in content_generators:
         if isinstance(generator, generators.ArticlesGenerator):
             for article in (
@@ -47,8 +46,8 @@ def open_graph_tag_articles(content_generators):
     return True
 
 
-def open_graph_tag(item):
-
+def open_graph_tag(item):  # pylint: disable=too-many-branches
+    """Open Graph items."""
     ogtags = [('og:title', item.title),
               ('og:type', 'article')]
 
@@ -56,16 +55,22 @@ def open_graph_tag(item):
     if image:
         ogtags.append(('og:image', image))
     else:
-        soup = BeautifulSoup(item._content, 'html.parser')
+        soup = BeautifulSoup(
+            item.content,
+            'html.parser')
         img_links = soup.find_all('img')
-        if  (len(img_links) > 0):
+        if img_links:
             img_src = img_links[0].get('src')
-            if not "http" in img_src:
+            if "http" not in img_src:
                 if item.settings.get('SITEURL', ''):
                     img_src = item.settings.get('SITEURL', '') + "/" + img_src
             ogtags.append(('og:image', img_src))
 
-    url = os.path.join(item.settings.get('SITEURL', ''), item.url)
+    url = os.path.join(
+        item.settings.get(
+            'SITEURL',
+            ''),
+        item.url)
     ogtags.append(('og:url', url))
 
     default_summary = item.summary
@@ -84,7 +89,7 @@ def open_graph_tag(item):
 
     if hasattr(item, 'date'):
         ogtags.append(('article:published_time',
-            strftime(item.date, "%Y-%m-%d")))
+                       strftime(item.date, "%Y-%m-%d")))
 
     if hasattr(item, 'modified'):
         ogtags.append(('article:modified_time', strftime(
@@ -92,11 +97,15 @@ def open_graph_tag(item):
 
     if hasattr(item, 'related_posts'):
         for related_post in item.related_posts:
-            url = os.path.join(item.settings.get('SITEURL', ''), related_post.url)
+            url = os.path.join(
+                item.settings.get(
+                    'SITEURL',
+                    ''),
+                related_post.url)
             ogtags.append(('og:see_also', url))
 
     author_fb_profiles = item.settings.get('AUTHOR_FB_ID', {})
-    if len(author_fb_profiles) > 0:
+    if author_fb_profiles:
         for author in item.authors:
             if author.name in author_fb_profiles:
                 ogtags.append(
@@ -114,4 +123,5 @@ def open_graph_tag(item):
 
 
 def register():
+    """Register pelican plugin."""
     signals.all_generators_finalized.connect(open_graph_tag_articles)
