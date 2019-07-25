@@ -78,12 +78,10 @@ def open_graph_tag(item):  # pylint: disable=too-many-branches
     ogtags.append(('og:description', description))
 
     default_locale = item.settings.get('LOCALE', [])
-    if default_locale:
+    if len(default_locale[0]) > 3:
         default_locale = default_locale[0]
-    else:
-        default_locale = ''
-    ogtags.append(
-        ('og:locale', item.metadata.get('og_locale', default_locale)))
+        ogtags.append(
+            ('og:locale', item.metadata.get('og_locale', default_locale)))
 
     ogtags.append(('og:site_name', item.settings.get('SITENAME', '')))
 
