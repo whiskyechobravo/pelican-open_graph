@@ -1,1 +1,2 @@
-from .open_graph import *
+"""open_graph initialize."""
+from .open_graph import *  # noqa
