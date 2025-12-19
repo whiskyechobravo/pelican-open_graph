@@ -4,6 +4,12 @@
 
 This plugin adds Open Graph Protocol tags to your articles.
 
+✏️ Note
+=======
+
+Please consider using the pelican-seo_ plugin instead. It is easier
+to install and does everything this plugin does, and more.
+
 
 Usage
 =====
@@ -44,3 +50,5 @@ The plugin also reads these metadata tags:
   the locale will be set to your Pelican settings ``LOCALE``.
 
 Additionally, the plugin reads article.related_posts to set ``og:see_also``.
+
+.. _pelican-seo: https://github.com/pelican-plugins/seo
